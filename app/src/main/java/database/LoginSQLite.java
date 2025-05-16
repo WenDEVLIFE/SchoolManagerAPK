@@ -34,9 +34,11 @@ public class LoginSQLite {
                 Cursor cursor = dbHelper.executeSQL(sql, new String[]{username, password});
                 if (cursor.moveToFirst()) {
                     String role = cursor.getString(cursor.getColumnIndexOrThrow("role"));
+                    String usernameFromDB = cursor.getString(cursor.getColumnIndexOrThrow("username"));
                     Toast.makeText(login, "Login Successful. Role: " + role, Toast.LENGTH_SHORT).show();
                     login.finish(); // Close the login activity
                     Intent intent = new Intent(login, SchoolActivity.class);
+                    intent.putExtra("username", usernameFromDB);
                     intent.putExtra("role", role);
                     login.startActivity(intent); // Start the SchoolActivity
 

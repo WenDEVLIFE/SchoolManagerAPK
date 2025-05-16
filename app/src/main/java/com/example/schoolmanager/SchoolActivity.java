@@ -7,9 +7,21 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import utils.ReplaceFragment;
 
 public class SchoolActivity extends AppCompatActivity {
 
+    private Fragment fragment;
+
+    private Bundle bundle;
+
+    private String username;
+
+    private String role;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,5 +32,46 @@ public class SchoolActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        username = getIntent().getStringExtra("username");
+        role = getIntent().getStringExtra("role");
+
+        LoadHome();
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+
+            int id = item.getItemId();
+
+            if (id == R.id.home) {
+                LoadHome();
+
+            } else if (id == R.id.students) {
+                LoadHome();
+            } else if (id == R.id.department) {
+                LoadHome();
+            }
+            else if (id == R.id.subject) {
+                LoadHome();
+            }
+            else if (id == R.id.logout) {
+                LoadHome();
+            }
+            return false;
+        });
+    }
+
+    void LoadHome(){
+        fragment = new HomeFragment();
+        bundle = new Bundle();
+        bundle.putString("username", getIntent().getStringExtra("username"));
+        bundle.putString("role", getIntent().getStringExtra("role"));
+        bundle.putString("userCount", getIntent().getStringExtra("userCount"));
+        bundle.putString("departmentCount", getIntent().getStringExtra("departmentCount"));
+        bundle.putString("studentCount", getIntent().getStringExtra("studentCount"));
+        bundle.putString("subjectCount", getIntent().getStringExtra("subjectCount"));
+        fragment.setArguments(bundle);
+        ReplaceFragment.getInstance().replaceFragment(fragment, getSupportFragmentManager());
+
     }
 }
