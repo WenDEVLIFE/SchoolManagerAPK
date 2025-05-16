@@ -1,6 +1,7 @@
 package database;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -68,6 +69,22 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public void open() {
+        database = getWritableDatabase();
+    }
+
+    public void close() {
+        if (database != null && database.isOpen()) {
+            database.close();
+        }
+    }
+
+    public Cursor executeSQL(String sql, String[] args) {
+        return database.rawQuery(sql, args);
+    }
+    public int getCount(Cursor cursor) {
+        return cursor.getCount();
+    }
     public SQLiteDatabase openDatabase() {
         String path = DB_PATH + DB_NAME;
         return SQLiteDatabase.openDatabase(path, null, SQLiteDatabase.OPEN_READWRITE);

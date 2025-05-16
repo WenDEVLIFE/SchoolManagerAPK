@@ -1,6 +1,8 @@
 package com.example.schoolmanager;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -24,6 +26,25 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
         initializeConnection();
+
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+        progressBar.setIndeterminate(true);
+
+        // Simulate a loading process
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000); // Simulate a 2-second loading time
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            runOnUiThread(() -> {
+
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            });
+        }).start();
     }
 
     void initializeConnection(){
