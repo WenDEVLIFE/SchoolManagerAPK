@@ -36,7 +36,7 @@ public class SessionManager {
     }
 
 
-    private boolean isLoggedIn() {
+    public boolean isLoggedIn() {
         if (sharedPreferences.getString(KEY_USERNAME, null) != null) {
             return sharedPreferences.contains(KEY_USERNAME) && sharedPreferences.contains(KEY_ROLE);
         } else {

@@ -12,6 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import database.SQLiteDatabaseHelper;
+import utils.SessionManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,10 +40,19 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             runOnUiThread(() -> {
+                SessionManager sessionManager = new SessionManager(MainActivity.this);
 
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
+                if (sessionManager.isLoggedIn()) {
+                    Intent intent = new Intent(MainActivity.this, SchoolActivity.class);
+                    intent.putExtra("username", sessionManager.getUsername());
+                    intent.putExtra("role", sessionManager.getRole());
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
             });
         }).start();
     }

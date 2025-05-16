@@ -1,8 +1,10 @@
 package com.example.schoolmanager;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -12,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import utils.ReplaceFragment;
+import utils.SessionManager;
 
 public class SchoolActivity extends AppCompatActivity {
 
@@ -55,7 +58,26 @@ public class SchoolActivity extends AppCompatActivity {
                 LoadHome();
             }
             else if (id == R.id.logout) {
-                LoadHome();
+
+                AlertDialog alertDialog = new AlertDialog.Builder(this)
+                        .setTitle("Logout")
+                        .setMessage("Are you sure you want to logout?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+                            finish();
+
+                            Intent intent = new Intent(SchoolActivity.this, LoginActivity.class);
+                            startActivity(intent);
+                            dialog.dismiss();
+
+                            SessionManager sessionManager = new SessionManager(this);
+                            sessionManager.clearSession();
+                        })
+                        .setNegativeButton("No", (dialog, which) -> {
+                            dialog.dismiss();
+                        })
+                        .create();
+
+                alertDialog.show();
             }
             return false;
         });
