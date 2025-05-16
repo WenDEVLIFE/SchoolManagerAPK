@@ -2,9 +2,13 @@ package database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UserSQL {
@@ -42,6 +46,49 @@ public class UserSQL {
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(context, "An error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public List<Map<String, Object>> GetData(Context context) {
+        SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
+        List<Map<String, Object>> userList = new ArrayList<>();
+
+        try (SQLiteDatabase db = dbHelper.getReadableDatabase();
+             Cursor cursor = db.rawQuery("SELECT * FROM users", null)) {
+
+            if (cursor.moveToFirst()) {
+                do {
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("id", cursor.getInt(cursor.getColumnIndexOrThrow("user_id")));
+                    user.put("username", cursor.getString(cursor.getColumnIndexOrThrow("username")));
+                    user.put("password", cursor.getString(cursor.getColumnIndexOrThrow("password")));
+                    user.put("role", cursor.getString(cursor.getColumnIndexOrThrow("role")));
+                    userList.add(user);
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "An error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        return userList;
+    }
+    public void DeleteData(String userid, Context context) {
+        SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        int userId = Integer.parseInt(userid);
+
+        String sql = "DELETE FROM users WHERE user_id = ?";
+
+        try {
+            db.execSQL(sql, new Object[]{userId});
+            Toast.makeText(context, "Data deleted successfully", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "An error occurred: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        } finally {
+            db.close();
         }
     }
 }
