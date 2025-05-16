@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -87,6 +88,40 @@ public class UserFragment extends Fragment implements UserAdapter.onCancelListen
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user, container, false);
+
+
+        SearchView searchView = view.findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                String searchText = query.toLowerCase();
+
+                List<UserModel> filteredList = new ArrayList<>();
+
+                for (UserModel user : userList) {
+                    if (user.getUsername().toLowerCase().contains(searchText)) {
+                        filteredList.add(user);
+                    }
+                }
+
+                userAdapter.searchList(filteredList);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                String searchText = newText.toLowerCase();
+                List<UserModel> filteredList = new ArrayList<>();
+                for (UserModel user : userList) {
+                    if (user.getUsername().toLowerCase().contains(searchText)) {
+                        filteredList.add(user);
+                    }
+                }
+                userAdapter.searchList(filteredList);
+                return false;
+            }
+        });
 
         FloatingActionButton addUserButton = view.findViewById(R.id.floatingActionButton);
         addUserButton.setOnClickListener(v -> {

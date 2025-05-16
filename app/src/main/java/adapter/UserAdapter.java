@@ -30,6 +30,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.LessonViewHold
         this.userList = userList;
     }
 
+    public void searchList(List<UserModel> filteredList) {
+        userList = filteredList;
+        notifyDataSetChanged();
+    }
 
 
     public interface onCancelListener {
