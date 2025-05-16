@@ -43,28 +43,28 @@ public class SchoolActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(item -> {
-
             int id = item.getItemId();
 
             if (id == R.id.home) {
                 LoadHome();
-
             } else if (id == R.id.students) {
-                LoadHome();
+                // Load the Students fragment
+                fragment = new StudentFragment();
+                ReplaceFragment.getInstance().replaceFragment(fragment, getSupportFragmentManager());
             } else if (id == R.id.department) {
-                LoadHome();
-            }
-            else if (id == R.id.subject) {
-                LoadHome();
-            }
-            else if (id == R.id.logout) {
-
+                // Load the Department fragment
+                fragment = new EnrollmentFragment();
+                ReplaceFragment.getInstance().replaceFragment(fragment, getSupportFragmentManager());
+            } else if (id == R.id.subject) {
+                // Load the Subject fragment
+                fragment = new SubjectFragment();
+                ReplaceFragment.getInstance().replaceFragment(fragment, getSupportFragmentManager());
+            } else if (id == R.id.logout) {
                 AlertDialog alertDialog = new AlertDialog.Builder(this)
                         .setTitle("Logout")
                         .setMessage("Are you sure you want to logout?")
                         .setPositiveButton("Yes", (dialog, which) -> {
                             finish();
-
                             Intent intent = new Intent(SchoolActivity.this, LoginActivity.class);
                             startActivity(intent);
                             dialog.dismiss();
@@ -72,14 +72,14 @@ public class SchoolActivity extends AppCompatActivity {
                             SessionManager sessionManager = new SessionManager(this);
                             sessionManager.clearSession();
                         })
-                        .setNegativeButton("No", (dialog, which) -> {
-                            dialog.dismiss();
-                        })
+                        .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
                         .create();
 
                 alertDialog.show();
             }
-            return false;
+
+            // Return true to indicate the item selection has been handled
+            return true;
         });
     }
 
