@@ -69,6 +69,10 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public String getDatabasePath() {
+        return context.getDatabasePath(DB_NAME).getAbsolutePath();
+    }
+
     public void open() {
         database = getWritableDatabase();
     }
@@ -98,6 +102,11 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Handle upgrade if needed
+    }
+
+    public void logDatabasePath() {
+        String path = DB_PATH + DB_NAME;
+        System.out.println("Database path: " + path);
     }
 
     public boolean testConnection() {

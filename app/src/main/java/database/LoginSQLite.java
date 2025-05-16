@@ -2,7 +2,7 @@ package database;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.se.omapi.Session;
+import android.database.sqlite.SQLiteDatabase;
 import android.widget.Toast;
 
 import com.example.schoolmanager.LoginActivity;
@@ -11,10 +11,8 @@ import com.example.schoolmanager.SchoolActivity;
 import utils.SessionManager;
 
 public class LoginSQLite {
-
-    String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
-
-    private static volatile  LoginSQLite instance;
+    private static final String LOGIN_QUERY = "SELECT * FROM users WHERE username = ? AND password = ?";
+    private static volatile LoginSQLite instance;
 
     public static LoginSQLite getInstance() {
         if (instance == null) {
@@ -29,38 +27,30 @@ public class LoginSQLite {
 
     public void IntializeLogin(String username, String password, LoginActivity login) {
         SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(login);
-        boolean isConnected = dbHelper.testConnection();
 
-        if (isConnected) {
-            try {
-                dbHelper.open();
-                Cursor cursor = dbHelper.executeSQL(sql, new String[]{username, password});
-                if (cursor.moveToFirst()) {
-
-                    SessionManager sessionManager = new SessionManager(login);
-
+        try (SQLiteDatabase db = dbHelper.getReadableDatabase()) {
+            try (Cursor cursor = db.rawQuery(LOGIN_QUERY, new String[]{username, password})) {
+                if (cursor != null && cursor.moveToFirst()) {
                     String role = cursor.getString(cursor.getColumnIndexOrThrow("role"));
                     String usernameFromDB = cursor.getString(cursor.getColumnIndexOrThrow("username"));
-                    Toast.makeText(login, "Login Successful. Role: " + role, Toast.LENGTH_SHORT).show();
-                    login.finish(); // Close the login activity
+
+                    SessionManager sessionManager = new SessionManager(login);
+                    sessionManager.saveSession(usernameFromDB, role);
+
                     Intent intent = new Intent(login, SchoolActivity.class);
                     intent.putExtra("username", usernameFromDB);
                     intent.putExtra("role", role);
-                    sessionManager.saveSession(usernameFromDB, role); // Save the session
-                    login.startActivity(intent); // Start the SchoolActivity
 
-                    // You can pass the role to another activity or use it as needed
+                    Toast.makeText(login, "Login Successful. Role: " + role, Toast.LENGTH_SHORT).show();
+                    login.startActivity(intent);
+                    login.finish();
                 } else {
                     Toast.makeText(login, "Invalid Username or Password", Toast.LENGTH_SHORT).show();
                 }
-                cursor.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                dbHelper.close();
             }
-        } else {
-            Toast.makeText(login, "DB Not Connected", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(login, "Database Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 }

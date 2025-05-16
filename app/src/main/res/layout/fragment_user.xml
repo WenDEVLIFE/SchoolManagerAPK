@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".HomeFragment">
+    tools:context=".UserFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -38,7 +38,7 @@
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:title="List of Students"
+            app:title="List of Users"
             app:titleTextColor="@color/white" />
 
         <SearchView
@@ -47,13 +47,13 @@
             android:layout_height="50dp"
             android:layout_marginTop="8dp"
             android:iconifiedByDefault="false"
-            android:queryHint="Search Students"
+            android:queryHint="Search Users"
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
             tools:layout_editor_absoluteX="0dp" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
             android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/searchView"

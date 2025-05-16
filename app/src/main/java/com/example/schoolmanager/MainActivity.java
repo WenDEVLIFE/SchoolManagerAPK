@@ -2,6 +2,7 @@ package com.example.schoolmanager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -63,5 +64,14 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(this, isConnected ? "DB Connected" : "DB Not Connected", Toast.LENGTH_SHORT).show();
 
+// Test connection
+        dbHelper.logDatabasePath();
+        if (dbHelper.testConnection()) {
+            Log.d("Database", "Database connected at: " + dbHelper.getDatabasePath());
+        } else {
+            Log.e("Database", "Database connection failed");
+        }
     }
+
+
 }

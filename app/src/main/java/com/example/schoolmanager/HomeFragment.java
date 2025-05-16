@@ -11,6 +11,8 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import utils.ReplaceFragment;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link HomeFragment#newInstance} factory method to
@@ -83,6 +85,16 @@ public class HomeFragment extends Fragment {
 
 
         FloatingActionButton viewUser = view.findViewById(R.id.floatingActionButton);
+        viewUser.setOnClickListener( v -> {
+
+            UserFragment userFragment = new UserFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("username", username);
+            bundle.putString("role", role);
+            userFragment.setArguments(bundle);
+            ReplaceFragment.getInstance().replaceFragment(userFragment, getParentFragmentManager());
+
+        });
 
         if (role.toLowerCase().equals("admin")) {
             viewUser.setVisibility(View.VISIBLE);
