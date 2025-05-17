@@ -198,7 +198,7 @@ public class StudentFragment extends Fragment implements StudentAdapter .onCance
                         // Save student data to database
                         StudentSQL.getInstance()
                                 .InsertData(studentData, getContext());
-
+                        loadStudents();
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .create()

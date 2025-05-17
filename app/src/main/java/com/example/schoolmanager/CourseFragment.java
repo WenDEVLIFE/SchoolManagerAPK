@@ -138,7 +138,7 @@ public class CourseFragment extends Fragment implements  CourseAdapter.onCancelL
                         SubjectCourseSQL.getInstance().AddCourse(selectedSubject, courseNameText, getContext());
                         Toast.makeText(getContext(), "Course added successfully", Toast.LENGTH_SHORT).show();
 
-
+                        loadCourse();
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .create()
