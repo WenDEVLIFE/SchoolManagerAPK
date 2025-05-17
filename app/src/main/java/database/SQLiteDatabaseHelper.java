@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -107,6 +108,40 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
     public void logDatabasePath() {
         String path = DB_PATH + DB_NAME;
         System.out.println("Database path: " + path);
+    }
+
+    public void updateDatabaseFromAssets() {
+        SQLiteDatabase db = null;
+        try {
+            // Close any existing connections
+            close();
+
+            // Copy updated database from assets
+            InputStream input = context.getAssets().open(DB_NAME);
+            String outFileName = DB_PATH + DB_NAME;
+            OutputStream output = new FileOutputStream(outFileName);
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = input.read(buffer)) > 0) {
+                output.write(buffer, 0, length);
+            }
+
+            output.flush();
+            output.close();
+            input.close();
+
+            // Verify the update
+            db = SQLiteDatabase.openDatabase(outFileName, null, SQLiteDatabase.OPEN_READWRITE);
+            Log.d("Database", "Database updated successfully from assets");
+
+        } catch (IOException e) {
+            Log.e("Database", "Error updating database: " + e.getMessage());
+        } finally {
+            if (db != null) {
+                db.close();
+            }
+        }
     }
 
     public boolean testConnection() {
