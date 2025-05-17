@@ -5,13 +5,18 @@ import android.app.DatePickerDialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.SearchView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -23,16 +28,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import adapter.StudentAdapter;
 import database.StudentSQL;
 import database.SubjectCourseSQL;
 import model.CourseModel;
+import model.StudentModel;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link StudentFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class StudentFragment extends Fragment {
+public class StudentFragment extends Fragment implements StudentAdapter .onCancelListener, StudentAdapter.onViewListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -44,6 +51,13 @@ public class StudentFragment extends Fragment {
     private String mParam2;
 
     List <CourseModel> courseList = new ArrayList<>();
+
+    List <StudentModel> studentList = new ArrayList<>();
+
+    StudentAdapter studentAdapter;
+
+    private RecyclerView studentRecyclerView;
+
 
     public StudentFragment() {
         // Required empty public constructor
@@ -190,6 +204,45 @@ public class StudentFragment extends Fragment {
                     .show();
         });
 
+        studentRecyclerView = view.findViewById(R.id.recyclerView);
+        studentRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        studentList = new ArrayList<>();
+        studentAdapter = new StudentAdapter(studentList);
+        studentAdapter.setOnCancelListener(this);
+        studentAdapter.setOnViewListener(this);
+        studentRecyclerView.setAdapter(studentAdapter);
+
+        // Load students from the database
+        loadStudents();
+
+        SearchView searchView = view.findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                List <StudentModel> filteredList = new ArrayList<>();
+                for (StudentModel student : studentList) {
+                    if (student.getFirstName().toLowerCase().contains(query.toLowerCase()) ||
+                            student.getLastName().toLowerCase().contains(query.toLowerCase())) {
+                        filteredList.add(student);
+                    }
+                }
+                studentAdapter.searchList(filteredList);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                List <StudentModel> filteredList = new ArrayList<>();
+                for (StudentModel student : studentList) {
+                    if (student.getFirstName().toLowerCase().contains(newText.toLowerCase()) ||
+                            student.getLastName().toLowerCase().contains(newText.toLowerCase())) {
+                        filteredList.add(student);
+                    }
+                }
+                studentAdapter.searchList(filteredList);
+                return false;
+            }
+        });
 
         return view;
     }
@@ -207,5 +260,97 @@ public class StudentFragment extends Fragment {
             courseList.add(dataModel);
         }
 
+    }
+
+    @Override
+    public void onCancel(int position) {
+
+        StudentModel student = studentList.get(position);
+        String studentId = student.getId();
+
+        // Delete the student from the database
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle("Delete Student")
+                .setMessage("Are you sure you want to delete this student?")
+                .setPositiveButton("Yes", (dialog1, which) -> {
+                    StudentSQL.getInstance().DeleteStudent(studentId, getContext());
+                    loadStudents();
+                    Toast.makeText(getContext(), "Student deleted successfully", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("No", null)
+                .create();
+        dialog.show();
+    }
+
+
+    private void loadStudents() {
+        studentList.clear();
+        List<Map<String, Object>> data = StudentSQL.getInstance().GetStudent(getContext());
+
+        for (Map<String, Object> item : data) {
+            StudentModel student = new StudentModel(
+                    (String) item.get("id"),
+                    (String) item.get("firstName"),
+                    (String) item.get("lastName"),
+                    (String) item.get("birthdate"),
+                    (String) item.get("email"),
+                    (String) item.get("phoneNumber"),
+                    (String) item.get("gender"),
+                    (String) item.get("selectedCourse")
+            );
+            studentList.add(student);
+        }
+
+        studentAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onView(int position) {
+        StudentModel student = studentList.get(position);
+
+        // Create LinearLayout container
+        LinearLayout layout = new LinearLayout(getContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(50, 30, 50, 30);
+
+        // Create text views for each field
+        TextView firstNameText = createTextView("First Name: " + student.getFirstName());
+        TextView lastNameText = createTextView("Last Name: " + student.getLastName());
+        TextView birthdateText = createTextView("Birthdate: " + student.getBirthdate());
+        TextView emailText = createTextView("Email: " + student.getEmail());
+        TextView phoneText = createTextView("Phone: " + student.getPhoneNumber());
+        TextView genderText = createTextView("Gender: " + student.getGender());
+        TextView courseText = createTextView("Course: " + student.getSelectedCourse());
+
+        // Add views to layout
+        layout.addView(firstNameText);
+        layout.addView(lastNameText);
+        layout.addView(birthdateText);
+        layout.addView(emailText);
+        layout.addView(phoneText);
+        layout.addView(genderText);
+        layout.addView(courseText);
+
+        // Show dialog
+        new AlertDialog.Builder(getContext())
+                .setTitle("Student Details")
+                .setView(layout)
+                .setPositiveButton("Close", null)
+                .create()
+                .show();
+    }
+
+
+    private TextView createTextView(String text) {
+        TextView textView = new TextView(getContext());
+        textView.setText(text);
+        textView.setTextSize(16);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        params.setMargins(0, 20, 0, 20);
+        textView.setLayoutParams(params);
+        return textView;
     }
 }
