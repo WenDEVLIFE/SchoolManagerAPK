@@ -31,6 +31,7 @@ import database.SubjectCourseSQL;
 import model.DepartmentModel;
 import model.ProfessorModel;
 import model.SubjectModel;
+import utils.ReplaceFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -169,6 +170,14 @@ public class SubjectFragment extends Fragment implements  SubjectAdapter.onCance
                     .show();
 
 
+        });
+
+        FloatingActionButton goToCourse = view.findViewById(R.id.floatingActionButton2);
+        goToCourse.setOnClickListener(v -> {
+            // Navigate to CourseFragment
+            CourseFragment courseFragment = new CourseFragment();
+
+            ReplaceFragment.getInstance().replaceFragment(courseFragment,getActivity().getSupportFragmentManager());
         });
 
         recyclerView = view.findViewById(R.id.recyclerView);

@@ -87,6 +87,23 @@ public class SubjectCourseSQL {
         return exists;
     }
 
+    public boolean isCourseExist(String courseName, Context context) {
+        SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        boolean exists = false;
+
+        String query = "SELECT * FROM Course WHERE CourseName = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{courseName});
+
+        if (cursor != null) {
+            exists = cursor.getCount() > 0;
+            cursor.close();
+        }
+
+        db.close();
+        return exists;
+    }
+
     public List <Map <String, Object>> GetSubject(Context context) {
         SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
@@ -141,6 +158,113 @@ public class SubjectCourseSQL {
                 Toast.makeText(context, "Subject deleted successfully", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context, "Failed to delete subject", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        } finally {
+            if (db.inTransaction()) {
+                db.endTransaction();
+            }
+            db.close();
+        }
+    }
+
+    public void AddCourse(String selectedSubject, String courseNameText, Context context) {
+        SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        try {
+            db.beginTransaction();
+
+            // First get the subject ID
+            String query = "SELECT SubjectID FROM Subject WHERE SubjectName = ?";
+            Cursor cursor = db.rawQuery(query, new String[]{selectedSubject});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int subjectId = cursor.getInt(cursor.getColumnIndexOrThrow("SubjectID"));
+                cursor.close();
+
+                // Insert into Course table
+                ContentValues values = new ContentValues();
+                values.put("CourseName", courseNameText);
+                values.put("SubjectID", subjectId);
+                values.put("GradeStatus", false);
+
+                long result = db.insert("Course", null, values);
+
+                if (result != -1) {
+                    db.setTransactionSuccessful();
+                    Toast.makeText(context, "Course added successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Failed to add course", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(context, "Subject not found", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        } finally {
+            if (db.inTransaction()) {
+                db.endTransaction();
+            }
+            db.close();
+        }
+    }
+
+    public List<Map <String, Object>> GetCourse(Context context) {
+        SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        List<Map<String, Object>> courseList = new ArrayList<>();
+
+        String query = "SELECT CourseID, CourseName, SubjectID FROM Course";
+        String getSubjectNameQuery = "SELECT SubjectName FROM Subject WHERE SubjectID = ?";
+        Cursor cursor = db.rawQuery(query, null);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+
+                int courseId = cursor.getInt(cursor.getColumnIndexOrThrow("CourseID"));
+                int subjectId = cursor.getInt(cursor.getColumnIndexOrThrow("SubjectID"));
+
+                String courseName = cursor.getString(cursor.getColumnIndexOrThrow("CourseName"));
+
+                // Get the subject name using the subject ID
+                Cursor subjectCursor = db.rawQuery(getSubjectNameQuery, new String[]{String.valueOf(subjectId)});
+                String subjectName = "";
+                if (subjectCursor != null && subjectCursor.moveToFirst()) {
+                    subjectName = subjectCursor.getString(subjectCursor.getColumnIndexOrThrow("SubjectName"));
+                    subjectCursor.close();
+                }
+                // Create a map to hold the course data
+                Map<String, Object> courseData = new HashMap<>();
+                courseData.put("courseID", courseId);
+                courseData.put("courseName", courseName);
+                courseData.put("subjectName", subjectName);
+                // Add the map to the list
+                courseList.add(courseData);
+            }
+            cursor.close();
+        }
+
+        db.close();
+        return courseList;
+    }
+
+    public void DeleteCourse(String courseId, Context context) {
+        SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        try {
+            db.beginTransaction();
+            int rowsAffected = db.delete("Course", "CourseID = ?", new String[]{courseId});
+
+            if (rowsAffected > 0) {
+                db.setTransactionSuccessful();
+                Toast.makeText(context, "Course deleted successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Failed to delete course", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             e.printStackTrace();
