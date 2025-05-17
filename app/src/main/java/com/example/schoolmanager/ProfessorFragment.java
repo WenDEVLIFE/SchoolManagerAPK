@@ -4,12 +4,15 @@ import android.app.AlertDialog;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -19,16 +22,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import adapter.ProfessrAdapter;
 import database.DepartmentSQL;
-import database.UserSQL;
 import model.DepartmentModel;
+import model.ProfessorModel;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ProfessorFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ProfessorFragment extends Fragment {
+public class ProfessorFragment extends Fragment implements ProfessrAdapter.onCancelListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -40,6 +44,12 @@ public class ProfessorFragment extends Fragment {
     private String mParam2;
 
     private List<DepartmentModel> departmentList = new ArrayList<>();
+
+    List <ProfessorModel> professorList = new ArrayList<>();
+
+    private ProfessrAdapter adapter;
+
+    private RecyclerView recyclerView;
 
     public ProfessorFragment() {
         // Required empty public constructor
@@ -113,12 +123,52 @@ public class ProfessorFragment extends Fragment {
                         // Call the method to add the professor
                         DepartmentSQL.getInstance().AddProfessor(professorName, selectedDepartmentHead, getContext());
                         LoadDepartments();
+                        LoadProfessor();
                     })
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .create()
                     .show();
 
         });
+
+        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        professorList = new ArrayList<>();
+        adapter = new ProfessrAdapter(professorList);
+        adapter.setOnCancelListener(this);
+        recyclerView.setAdapter(adapter);
+
+        // Load professors from the database
+        LoadProfessor();
+
+        SearchView searchView = view.findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                List<ProfessorModel> filteredList = new ArrayList<>();
+                for (ProfessorModel item : professorList) {
+                    if (item.getProfessorName().toLowerCase().contains(query.toLowerCase())) {
+                        filteredList.add(item);
+                    }
+                }
+                adapter.searchList(filteredList);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                List<ProfessorModel> filteredList = new ArrayList<>();
+                for (ProfessorModel item : professorList) {
+                    if (item.getProfessorName().toLowerCase().contains(newText.toLowerCase())) {
+                        filteredList.add(item);
+                    }
+                }
+                adapter.searchList(filteredList);
+                return true;
+            }
+        });
+
+
 
         return view;
     }
@@ -138,5 +188,44 @@ public class ProfessorFragment extends Fragment {
             Toast.makeText(getContext(), "Department head: " + departmentHead, Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    @Override
+    public void onCancel(int position) {
+
+        ProfessorModel professor = professorList.get(position);
+        String professorId = professor.getId();
+
+
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
+                .setTitle("Delete Professor")
+                .setMessage("Are you sure you want to delete this professor?")
+                .setPositiveButton("Yes", (dialog1, which) -> {
+                    // Call the method to delete the department
+                    DepartmentSQL.getInstance().deleteProfessor(professorId, getContext());
+                    LoadProfessor();
+                })
+                .setNegativeButton("No", (dialog12, which) -> dialog12.dismiss())
+                .create();
+
+        dialog.show();
+
+    }
+
+    private void LoadProfessor() {
+        professorList.clear();
+
+        List<Map<String, Object>> data = DepartmentSQL.getInstance().GetProfessors(getContext());
+
+        for (Map<String, Object> item : data) {
+            String professorId = String.valueOf(item.get("professorID"));
+            String professorName = (String) item.get("professorName");
+            String departmentHead = (String) item.get("departmentHead");
+
+            ProfessorModel dataModel = new ProfessorModel(professorId, professorName, departmentHead);
+            professorList.add(dataModel);
+
+            Toast.makeText(getContext(), "Professor name: " + professorName, Toast.LENGTH_SHORT).show();
+        }
     }
 }

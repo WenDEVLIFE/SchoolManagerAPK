@@ -193,4 +193,62 @@ public class DepartmentSQL {
             db.close();
         }
     }
+
+    public  List <Map<String, Object>> GetProfessors(Context context) {
+        SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
+        List<Map<String, Object>> dataList = new ArrayList<>();
+
+        try (SQLiteDatabase db = dbHelper.getReadableDatabase();
+             Cursor cursor = db.rawQuery("SELECT * FROM Professor", null)) {
+
+            if (cursor.moveToFirst()) {
+                do {
+
+                    Cursor departmentCursor = db.rawQuery("SELECT DepartmentHead FROM Department WHERE DepartmentID = ?", new String[]{String.valueOf(cursor.getInt(cursor.getColumnIndexOrThrow("DepartmentID")))});
+                    String departmentHead = null;
+                    if (departmentCursor != null && departmentCursor.moveToFirst()) {
+                        departmentHead = departmentCursor.getString(departmentCursor.getColumnIndexOrThrow("DepartmentHead"));
+                        departmentCursor.close();
+                    }
+                    Map<String, Object> professor = new HashMap<>();
+                    professor.put("professorID", cursor.getInt(cursor.getColumnIndexOrThrow("ProfessorID")));
+                    professor.put("professorName", cursor.getString(cursor.getColumnIndexOrThrow("NameOfProfessor")));
+                    professor.put("departmentHead", departmentHead);
+                    dataList.add(professor);
+                } while (cursor.moveToNext());
+
+                Toast.makeText(context, "Data retrieved successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "No professor data found", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        return dataList;
+    }
+
+    public void deleteProfessor(String professorId, Context context) {
+        SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        try {
+            String whereClause = "ProfessorID = ?";
+            String[] whereArgs = { professorId };
+
+            int rowsDeleted = db.delete("Professor", whereClause, whereArgs);
+
+            if (rowsDeleted > 0) {
+                Toast.makeText(context, "Professor deleted successfully", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "No professor found with the given ID", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        } finally {
+            db.close();
+        }
+    }
 }
