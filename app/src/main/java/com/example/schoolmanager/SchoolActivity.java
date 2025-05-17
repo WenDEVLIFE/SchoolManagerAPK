@@ -53,7 +53,7 @@ public class SchoolActivity extends AppCompatActivity {
                 ReplaceFragment.getInstance().replaceFragment(fragment, getSupportFragmentManager());
             } else if (id == R.id.department) {
                 // Load the Department fragment
-                fragment = new EnrollmentFragment();
+                fragment = new DepartmentFragment();
                 ReplaceFragment.getInstance().replaceFragment(fragment, getSupportFragmentManager());
             } else if (id == R.id.subject) {
                 // Load the Subject fragment
