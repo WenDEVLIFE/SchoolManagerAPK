@@ -238,7 +238,7 @@ public class CourseFragment extends Fragment implements  CourseAdapter.onCancelL
             String subjectName = (String) item.get("subjectName");
             String courseName = (String) item.get("courseName");
 
-            CourseModel dataModel = new CourseModel(courseId, subjectName, courseName);
+            CourseModel dataModel = new CourseModel(courseId, courseName, subjectName);
             courseList.add(dataModel);
         }
         courseAdapter.notifyDataSetChanged();

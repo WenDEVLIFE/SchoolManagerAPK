@@ -33,6 +33,7 @@ import database.StudentSQL;
 import database.SubjectCourseSQL;
 import model.CourseModel;
 import model.StudentModel;
+import utils.ReplaceFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -202,6 +203,13 @@ public class StudentFragment extends Fragment implements StudentAdapter .onCance
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .create()
                     .show();
+        });
+
+        FloatingActionButton GoToCourseButton = view.findViewById(R.id.floatingActionButton4);
+        GoToCourseButton.setOnClickListener(v -> {
+            // Navigate to CourseFragment
+          Fragment gradeFragment = new GradeFragment();
+            ReplaceFragment.getInstance().replaceFragment(gradeFragment, getParentFragmentManager());
         });
 
         studentRecyclerView = view.findViewById(R.id.recyclerView);

@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import database.SQLiteDatabaseHelper;
 import utils.ReplaceFragment;
 
 /**
@@ -82,6 +83,21 @@ public class HomeFragment extends Fragment {
 
         TextView welcomeTextView = view.findViewById(R.id.textView3);
         welcomeTextView.setText("Welcome Back " + username);
+
+        // Load counts
+        SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(getContext());
+
+        // Find TextViews for counts
+        TextView userCountView = view.findViewById(R.id.textView5);
+        TextView departmentCountView = view.findViewById(R.id.textView7);
+        TextView studentCountView = view.findViewById(R.id.textView9);
+        TextView subjectCountView = view.findViewById(R.id.textView12);
+
+        // Set counts
+        userCountView.setText(String.valueOf(dbHelper.getUserCount()));
+        departmentCountView.setText(String.valueOf(dbHelper.getDepartmentCount()));
+        studentCountView.setText(String.valueOf(dbHelper.getStudentCount()));
+        subjectCountView.setText(String.valueOf(dbHelper.getSubjectCount()));
 
 
         FloatingActionButton viewUser = view.findViewById(R.id.floatingActionButton);
