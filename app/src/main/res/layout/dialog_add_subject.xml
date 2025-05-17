@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         android:fontFamily="sans-serif-condensed-medium"
-        android:text="Select Assigned Professr" />
+        android:text="Select Assigned Professor" />
 
     <Spinner
         android:id="@+id/departmentSpinner"

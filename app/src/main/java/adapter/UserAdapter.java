@@ -101,7 +101,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.LessonViewHold
         public void bind(UserModel info) {
             // Bind data to views
             Name.setText("Username:" + info.getUsername());
-            role.setText("Role" + info.getRole());
+            role.setText("Role:" + info.getRole());
 
 
         }

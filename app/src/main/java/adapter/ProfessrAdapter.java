@@ -99,7 +99,7 @@ public class ProfessrAdapter extends RecyclerView.Adapter<ProfessrAdapter.Lesson
         public void bind(ProfessorModel info) {
             // Bind data to views
             professorName.setText("Professor Name: " + info.getProfessorName());
-            departmentName.setText("Department" + info.getNameOfDepartment());
+            departmentName.setText("Department:" + info.getNameOfDepartment());
 
 
         }
