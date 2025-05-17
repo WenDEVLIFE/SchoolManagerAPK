@@ -151,4 +151,46 @@ public class DepartmentSQL {
             db.close();
         }
     }
+
+    public void AddProfessor(String professorName, String selectedDepartmentHead, Context context) {
+        SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        try {
+            db.beginTransaction();
+
+            // First get the department ID
+            String query = "SELECT DepartmentID FROM Department WHERE DepartmentHead = ?";
+            Cursor cursor = db.rawQuery(query, new String[]{selectedDepartmentHead});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int departmentId = cursor.getInt(cursor.getColumnIndexOrThrow("DepartmentID"));
+                cursor.close();
+
+                // Now insert into Professor table with department reference
+                ContentValues profValues = new ContentValues();
+                profValues.put("NameOfProfessor", professorName);
+                profValues.put("DepartmentID", departmentId);  // Reference to Department
+
+                long result = db.insert("Professor", null, profValues);
+
+                if (result != -1) {
+                    db.setTransactionSuccessful();
+                    Toast.makeText(context, "Professor added successfully", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(context, "Failed to add professor", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(context, "Department not found", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        } finally {
+            if (db.inTransaction()) {
+                db.endTransaction();
+            }
+            db.close();
+        }
+    }
 }

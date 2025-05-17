@@ -29,6 +29,7 @@ import database.DepartmentSQL;
 import database.UserSQL;
 import model.DepartmentModel;
 import model.UserModel;
+import utils.ReplaceFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -123,6 +124,12 @@ public class DepartmentFragment extends Fragment implements  DepartmentAdapter.o
                     .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                     .create()
                     .show();
+        });
+
+        FloatingActionButton professorButton = view.findViewById(R.id.floatingActionButton3);
+        professorButton.setOnClickListener(v -> {
+            Fragment professorFragment = new ProfessorFragment();
+            ReplaceFragment.getInstance().replaceFragment(professorFragment, getActivity().getSupportFragmentManager());
         });
 
         departmentRecyclerView = view.findViewById(R.id.recyclerView);

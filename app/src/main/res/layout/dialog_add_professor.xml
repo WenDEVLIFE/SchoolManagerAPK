@@ -6,7 +6,7 @@
     android:padding="16dp">
 
     <EditText
-        android:id="@+id/usernameInput"
+        android:id="@+id/professorNameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter Professor Name"
