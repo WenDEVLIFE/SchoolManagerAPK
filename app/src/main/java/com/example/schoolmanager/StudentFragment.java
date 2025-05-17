@@ -8,6 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link StudentFragment#newInstance} factory method to
@@ -60,6 +62,11 @@ public class StudentFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_student, container, false);
+
+        FloatingActionButton addStudentButton = view.findViewById(R.id.floatingActionButton);
+        addStudentButton.setOnClickListener(v -> {
+
+        });
 
         return view;
     }
