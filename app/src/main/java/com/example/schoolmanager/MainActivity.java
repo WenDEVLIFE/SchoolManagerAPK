@@ -64,6 +64,9 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(this, isConnected ? "DB Connected" : "DB Not Connected", Toast.LENGTH_SHORT).show();
 
+        // Update database from assets
+        //dbHelper.updateDatabaseFromAssets();
+
 // Test connection
         dbHelper.logDatabasePath();
         if (dbHelper.testConnection()) {
