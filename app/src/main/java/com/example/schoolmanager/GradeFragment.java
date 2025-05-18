@@ -31,7 +31,6 @@ import database.GradeSQL;
 import database.StudentSQL;
 import database.SubjectCourseSQL;
 import model.GradeModel;
-import model.StudentModel;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -243,12 +242,13 @@ public class GradeFragment extends Fragment implements  GradeAdapter.onCancelLis
         gradeList.clear();
         List<Map<String, Object>> grades = GradeSQL.getInstance().GetGrade(getContext());
         for (Map<String, Object> grade : grades) {
-            String id = String.valueOf(grade.get("id"));
+            String gradeID = String.valueOf(grade.get("gradeID"));
+            String enrollmentID = String.valueOf(grade.get("enrollmentID"));
             String studentName = (String) grade.get("studentName");
             String subjectName = (String) grade.get("subjectName");
             boolean isEnrolled = (boolean) grade.get("enrollmentStatus");
 
-            GradeModel gradeModel = new GradeModel(id, studentName, subjectName, isEnrolled);
+            GradeModel gradeModel = new GradeModel(gradeID, enrollmentID, studentName, subjectName, isEnrolled);
             gradeList.add(gradeModel);
         }
         gradeAdapter.notifyDataSetChanged();
@@ -258,13 +258,14 @@ public class GradeFragment extends Fragment implements  GradeAdapter.onCancelLis
     public void onCancel(int position) {
 
         GradeModel grade = gradeList.get(position);
-        String id = grade.getId();
+        String gradeID = grade.getGradeID();
+        String enrollmentID = grade.getEnrollmentID();
 
         new AlertDialog.Builder(getContext())
                 .setTitle("Delete Grade")
                 .setMessage("Are you sure you want to delete this grade?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    GradeSQL.getInstance().deleteGrade(getContext(), id);
+                    GradeSQL.getInstance().deleteGrade(getContext(), gradeID, enrollmentID);
                     loadGrade();
                     Toast.makeText(getContext(), "Grade deleted successfully", Toast.LENGTH_SHORT).show();
                 })

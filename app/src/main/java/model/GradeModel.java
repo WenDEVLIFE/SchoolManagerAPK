@@ -2,7 +2,9 @@ package model;
 
 public class GradeModel {
 
-    String id;
+    String enrollmentID;
+
+    String gradeID;
 
     String StudentName;
 
@@ -10,27 +12,33 @@ public class GradeModel {
 
     boolean isEnrolled;
 
-
-    public GradeModel(String id, String studentName, String subjectName, boolean isEnrolled) {
-        this.id = id;
+    public GradeModel(String enrollmentID, String gradeID, String studentName, String subjectName, boolean isEnrolled) {
+        this.enrollmentID = enrollmentID;
+        this.gradeID = gradeID;
         StudentName = studentName;
         SubjectName = subjectName;
         this.isEnrolled = isEnrolled;
     }
 
-    public String getId() {
-        return id;
+    public String getEnrollmentID() {
+        return enrollmentID;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setEnrollmentID(String enrollmentID) {
+        this.enrollmentID = enrollmentID;
     }
 
+    public String getGradeID() {
+        return gradeID;
+    }
+
+    public void setGradeID(String gradeID) {
+        this.gradeID = gradeID;
+    }
 
     public String getStudentName() {
         return StudentName;
     }
-
 
     public void setStudentName(String studentName) {
         StudentName = studentName;
@@ -55,11 +63,15 @@ public class GradeModel {
     @Override
     public String toString() {
         return "GradeModel{" +
-                "id='" + id + '\'' +
+                "enrollmentID='" + enrollmentID + '\'' +
+                ", gradeID='" + gradeID + '\'' +
                 ", StudentName='" + StudentName + '\'' +
                 ", SubjectName='" + SubjectName + '\'' +
                 ", isEnrolled=" + isEnrolled +
                 '}';
     }
+
+
+
 
 }

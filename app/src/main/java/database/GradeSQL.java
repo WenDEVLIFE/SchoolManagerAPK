@@ -81,7 +81,7 @@ public class GradeSQL {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         List<Map<String, Object>> gradeList = new ArrayList<>();
 
-        String query = "SELECT e.GradeID, s.FirstName, s.LastName, sub.SubjectName, e.EnrollmentStatus " +
+        String query = "SELECT e.EnrollmentID, e.GradeID, s.FirstName, s.LastName, sub.SubjectName, e.EnrollmentStatus " +
                 "FROM Enrollment e " +
                 "JOIN Student s ON e.StudentID = s.StudentID " +
                 "JOIN Subject sub ON e.SubjectID = sub.SubjectID " +
@@ -92,11 +92,12 @@ public class GradeSQL {
         if (cursor.moveToFirst()) {
             do {
                 Map<String, Object> gradeData = new HashMap<>();
-                gradeData.put("EnrollmentID", cursor.getString(0));
-                String fullName = cursor.getString(1) + " " + cursor.getString(2);
+                gradeData.put("enrollmentID", cursor.getString(0));
+                gradeData.put("gradeID", cursor.getString(1));
+                String fullName = cursor.getString(2) + " " + cursor.getString(3);
                 gradeData.put("studentName", fullName);
-                gradeData.put("subjectName", cursor.getString(3));
-                gradeData.put("enrollmentStatus", cursor.getInt(4) == 1);
+                gradeData.put("subjectName", cursor.getString(4));
+                gradeData.put("enrollmentStatus", cursor.getInt(5) == 1);
                 gradeList.add(gradeData);
             } while (cursor.moveToNext());
         }
@@ -106,24 +107,28 @@ public class GradeSQL {
         return gradeList;
     }
 
-    public void deleteGrade(Context context, String id) {
+    public void deleteGrade(Context context, String gradeID, String enrollmentID) {
         SQLiteDatabaseHelper dbHelper = new SQLiteDatabaseHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.beginTransaction();
 
         try {
-            String whereClause = "GradeID = ?";
-            String[] whereArgs = {id};
+            String whereClauseEnrollment = "GradeID = ?";
+            String whereClauseGrade = "GradeID = ?";
+            String[] whereArgs = {gradeID};
 
-            int rowsDeleted = db.delete("Enrollment", whereClause, whereArgs);
+            // Delete from Enrollment table first (child table)
+            int enrollmentRowsDeleted = db.delete("Enrollment", whereClauseEnrollment, whereArgs);
 
-            if (rowsDeleted > 0) {
+            // Then delete from Grade table (parent table)
+            int gradeRowsDeleted = db.delete("Grade", whereClauseGrade, whereArgs);
+
+            if (enrollmentRowsDeleted > 0 && gradeRowsDeleted > 0) {
+                db.setTransactionSuccessful();
                 Toast.makeText(context, "Grade deleted successfully", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(context, "No grade found with the given ID", Toast.LENGTH_SHORT).show();
+                throw new Exception("No grade found with the given ID");
             }
-
-            db.setTransactionSuccessful();
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(context, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
